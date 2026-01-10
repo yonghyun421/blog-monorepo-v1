@@ -3,6 +3,7 @@ import { compareDesc } from "date-fns";
 import { BentoGrid } from "@/components/bento-grid";
 import { PostCard } from "@/components/post-card";
 import { Button } from "@repo/ui/button";
+import { ModeToggle } from "@/components/mode-toggle";
 
 export default function Home() {
   const posts = allPosts.sort((a, b) => compareDesc(new Date(a.date), new Date(b.date)));
@@ -16,7 +17,10 @@ export default function Home() {
             Learning, coding, and building.
           </p>
         </div>
-        <Button>Subscribe</Button>
+        <div className="flex gap-4">
+          <ModeToggle />
+          <Button>Subscribe</Button>
+        </div>
       </header>
 
       <BentoGrid>
