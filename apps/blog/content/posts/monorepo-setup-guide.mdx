@@ -1,0 +1,97 @@
+---
+title: "2026년 최신 기술 스택으로 구축하는 Monorepo 블로그 셋업 가이드"
+date: "2026-01-10"
+description: "Next.js 16, React 19, Turborepo를 활용하여 확장 가능한 모노레포 환경을 구축하는 방법을 소개합니다."
+tags: ["Monorepo", "Next.js", "Turborepo", "React 19", "Guide"]
+---
+
+최근 다양한 스택에 대해 공부해보기 위해 새롭게 블로그를 만들면서 구축한 **모노레포(Monorepo) 시스템**에 대해 공유하려고 합니다. 단순히 블로그 하나만 만드는 것이 아니라, 추후 다양한 프로젝트 확장을 고려하여 **확장성**과 **생산성**에 초점을 맞춘 아키텍처를 설계했습니다.
+
+특히 **Next.js 16**, **React 19** 등 최신 기술 스택을 적극 도입하여 2026년 현재 시점에서 가장 모던한 개발 환경을 구성해보았습니다.
+
+## 왜 Monorepo인가요?
+
+제가 모노레포를 선택한 이유는 명확합니다.
+
+1.  **코드 재사용성 극대화**: UI 컴포넌트, 유틸리티 함수, 설정 파일(ESLint, TSConfig) 등을 여러 앱에서 공유할 수 있습니다.
+2.  **일관된 개발 경험**: 모든 프로젝트가 동일한 린트 규칙과 스타일 가이드를 따르게 하여 코드 품질을 유지하기 쉽습니다.
+3.  **효율적인 의존성 관리**: `pnpm`의 워크스페이스 기능을 통해 패키지 버전을 중앙에서 관리하고 디스크 공간을 절약할 수 있습니다.
+
+## 기술 스택 (Tech Stack)
+
+이번 프로젝트에서 사용한 핵심 기술들은 다음과 같습니다.
+
+| 기술 | 버전 | 설명 |
+| :--- | :--- | :--- |
+| **Framework** | Next.js 16.1 | Turbopack이 기본 탑재된 최신 Next.js 프레임워크 |
+| **Library** | React 19 | 최신 리액트 기능을 활용 (Compiler 등) |
+| **Monorepo Tool** | Turborepo | 고성능 빌드 시스템 및 파이프라인 관리 |
+| **Package Manager** | pnpm | 빠르고 효율적인 패키지 매니저 |
+| **Styling** | Tailwind CSS 3.4 | 제로 런타임 스타일링 |
+| **UI Library** | Radix UI + CVA | 접근성 높은 헤드리스 UI와 변형 관리 |
+| **Content** | Contentlayer 2 | Type-safe한 MDX 콘텐츠 관리 |
+
+## 프로젝트 구조 (Project Structure)
+
+Turborepo의 표준 구조를 따르면서도 실용적으로 구성했습니다.
+
+```bash
+.
+├── apps/
+│   ├── blog/          # 현재 보고 계신 Next.js 블로그
+│   ├── web/           # 또 다른 웹 애플리케이션 (예: 포트폴리오)
+│   └── docs/          # 문서 사이트
+└── packages/
+    ├── ui/            # 공유 UI 컴포넌트 (Button, Input 등)
+    ├── eslint-config/ # 공유 ESLint 설정
+    └── typescript-config/ # 공유 TSConfig 설정
+```
+
+### 1. 공유 UI 패키지 (`packages/ui`)
+
+디자인 시스템을 구축하여 모든 앱에서 일관된 UI를 사용하도록 했습니다. `cn` 유틸리티와 `CVA(Class Variance Authority)`를 사용하여 유연하고 확장 가능한 컴포넌트를 만들었습니다.
+
+```tsx
+// packages/ui/src/button.tsx 예시
+import { cva, type VariantProps } from "class-variance-authority";
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors...",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+     // ...
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 rounded-md px-3",
+        // ...
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+);
+```
+
+### 2. 블로그 앱 (`apps/blog`)
+
+블로그는 **MDX**를 사용하여 콘텐츠를 관리합니다. **Contentlayer 2**를 도입하여 마크다운 파일이 타입이 보장된 JSON 데이터로 변환되므로, 컴포넌트에서 안전하게 사용할 수 있습니다.
+
+특히 홈 화면은 최신 트렌드인 **Bento Grid** 레이아웃을 적용하여 시각적인 재미를 더했고, 상세 페이지는 가독성을 최우선으로 **3단 레이아웃**으로 구성했습니다.
+
+## 개발 경험 (DX)
+
+Turborepo의 캐싱 기능 덕분에 빌드 속도가 획기적으로 빠릅니다. 한 번 빌드한 결과물은 캐시되어, 코드가 변경되지 않은 부분은 즉시 재사용됩니다.
+
+또한 `concurrently`를 사용하여 Next.js 서버와 Contentlayer 감시 프로세스를 동시에 실행함으로써 쾌적한 로컬 개발 환경을 구축했습니다.
+
+## 마치며
+
+이렇게 구축된 모노레포 환경은 앞으로 다양한 사이드 프로젝트를 실험하고 확장하는 데 든든한 기반이 될 것입니다. 새로운 아이디어가 떠오르면 `apps` 폴더에 새 프로젝트를 추가하고, 이미 잘 만들어진 `packages/ui`를 가져다 쓰기만 하면 되니까요!
+
+앞으로 이 블로그를 통해 개발 과정에서 배운 점들을 꾸준히 기록해 나갈 예정입니다. 많은 관심 부탁드립니다! 🚀
