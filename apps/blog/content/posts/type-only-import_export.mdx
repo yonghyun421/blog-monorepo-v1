@@ -1,0 +1,58 @@
+---
+title: "TypeScript에서 Type-only import/export 사용하기"
+date: "2024-09-21"
+description: "Type-only import/export란?"
+---
+# TypeScript에서 Type-only import/export 사용하기
+
+## Type-only import/export란?
+
+- Type-only import/export는 TypeScript 3.8에서 새로 추가된 기술이다.
+- 이 문법을 사용해서 import/export를 하게 되면 런타임 과정에서 js에서는 type을 사용할 필요가 없기 때문에 컴파일 결과에서 제외된다. 따라서 번들링 과정에서 코드 길이가 더 짧아져 번들 사이즈가 줄어든다는 점이 있다.
+
+## Type-only import/export의 사용 예
+
+### import하는 경우
+
+```ts
+import type { MyType } from "./types";
+```
+
+### export하는 경우
+
+```ts
+type MyType = {
+  name: string;
+  age: number;
+};
+
+export type { MyType };
+```
+
+- 여기서 중요한 점은 interface는 Type-only export를 사용할 수 없다는 점이다. 오직 type alias를 사용한 경우에만 Type-only export를 할 수 있다.
+
+## Type-only import/export의 장점
+
+1. 코드 가독성 향상
+
+   - 타입만을 import하는 경우, 코드의 가독성이 향상되고 코드량이 줄어들어 유지보수가 용이해진다.
+
+2. 불필요한 모듈 로딩 방지
+
+   - 전체 모듈을 import하는 경우, 애플리케이션이 로드될 때 불필요한 모듈도 함께 로딩되어 성능 저하를 초래할 수 있다. 하지만 타입만을 import하는 경우, 필요한 타입만을 로드하여 성능 개선에 도움을 줄 수 있다.
+
+3. 컴파일 속도 향상
+
+   - 타입만을 import하는 경우, 컴파일러가 불필요한 코드를 처리하지 않기 때문에 컴파일 속도가 빨라진다.
+
+4. 타입 안정성
+   - 타입만을 import하는 경우, 타입 호환성 검사를 보다 엄격하게 수행할 수 있어 타입 안정성을 보장할 수 있다.
+
+## Type-only import/export시 주의사항
+
+1. 타입 충돌 문제
+
+   - Type-only import/export를 사용할 때, 같은 타입 이름을 가진 다른 모듈에서 import/export 할 경우, 타입 충돌이 발생할 수 있다.
+
+2. 외부 모듈에서의 사용
+   - 타입 정보만을 export하기 때문에, 구현체 정보는 export되지 않으므로 Type-only import/export는 외부 모듈에서는 사용할 수 없다.

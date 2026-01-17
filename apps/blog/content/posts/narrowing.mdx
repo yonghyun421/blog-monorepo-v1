@@ -1,0 +1,201 @@
+---
+title: "Narrowing"
+date: "2024-09-23"
+description: "Narrowing은 Union 타입에서 더욱 구체적인 타입으로 논리적으로 유추 할 수 있게 되는 걸 의미한다."
+---
+# Narrowing
+
+- Narrowing은 Union 타입에서 더욱 구체적인 타입으로 논리적으로 유추 할 수 있게 되는 걸 의미한다.
+
+## Narrowing 종류
+
+1. Assignment Narrowing
+2. typeof Narrowing
+3. Truthiness Narrowing
+4. Equality Narrowing
+5. in operator Narrowing
+6. instanceof Narrowing
+7. discriminated union Narrowing(차별된 유니언 내로잉)
+8. exhaustiveness checking
+
+### 1. Assignment Narrowing
+
+- 특정 값을 할당해서 Narrowing
+
+```tsx
+let numberOrString: number | string = "string";
+
+numberOrString.toString();
+```
+
+### 2. typeof Narrowing
+
+```tsx
+numberOrString = Math.random() > 0.5 ? 1123 : "string";
+
+if (typeof numberOrString === "string") {
+  numberOrString.toString();
+} else {
+  numberOrString.toFixed(2);
+}
+```
+
+### 3. Truthiness Narrowing
+
+```tsx
+let nullOrString: null | string[] = Math.random() > 0.5 ? null : ["string"];
+
+if (nullOrString) {
+  nullOrString.toString();
+} else {
+  nullOrString;
+}
+```
+
+### 4. Equality Narrowing
+
+```tsx
+let numberOrString2: number | string = Math.random() > 0.5 ? 1123 : "string";
+let stringOrBool2: string | boolean = Math.random() > 0.5 ? "string2" : true;
+
+if (numberOrString2 === stringOrBool2) {
+  numberOrString2;
+  stringOrBool2;
+} else {
+  numberOrString2;
+  stringOrBool2;
+}
+
+let numberOrStringOrNull: number | string | null =
+  Math.random() > 0.5 ? 1123 : Math.random() > 0.5 ? "string" : null;
+
+if (typeof numberOrStringOrNull === "number") {
+  numberOrStringOrNull;
+} else {
+  numberOrStringOrNull;
+}
+```
+
+### 5. in operator Narrowing
+
+```tsx
+interface Human {
+  name: string;
+  age: number;
+}
+
+interface Dog {
+  name: string;
+  type: number;
+}
+
+let human: Human = {
+  name: "4.21ee",
+  age: 33,
+};
+
+let dog: Dog = {
+  name: "초코",
+  type: 1,
+};
+
+let humanOrDog: Human | Dog = Math.random() > 0.5 ? human : dog;
+
+if ("type" in humanOrDog) {
+  humanOrDog;
+} else {
+  humanOrDog;
+}
+```
+
+### 6. instanceof Narrowing
+
+```tsx
+let dateOrString: Date | string = Math.random() > 0.5 ? new Date() : "string";
+
+if (dateOrString instanceof Date) {
+  dateOrString;
+} else {
+  dateOrString;
+}
+```
+
+### 7. discriminated union Narrowing(차별된 유니언 내로잉)
+
+```tsx
+interface Animal {
+  type: "dog" | "human";
+  height?: number;
+  breed?: string;
+}
+
+let animal: Animal =
+  Math.random() > 0.5
+    ? { type: "human", height: 170 }
+    : { type: "dog", breed: "poodle" };
+
+if (animal.type === "human") {
+  animal.height;
+} else {
+  animal.breed;
+  animal.height;
+}
+
+interface Human2 {
+  type: "human";
+  height: number;
+}
+
+interface Dog2 {
+  type: "dog";
+  breed: string;
+}
+
+interface Fish2 {
+  type: "fish";
+  swimSpeed: number;
+}
+
+type HumanOrDog2 = Human2 | Dog2 | Fish2;
+
+let humanOrDog2: HumanOrDog2 =
+  Math.random() > 0.5
+    ? { type: "human", height: 170 }
+    : // : { type: "dog", breed: "poodle" };
+    Math.random() > 0.5
+    ? {
+        type: "dog",
+        breed: "poodle",
+      }
+    : {
+        type: "fish",
+        swimSpeed: 100,
+      };
+
+if (humanOrDog2.type === "human") {
+  humanOrDog2;
+} else {
+  humanOrDog2;
+}
+```
+
+### 8. exhaustiveness checking
+
+```tsx
+switch (humanOrDog2.type) {
+  case "human":
+    humanOrDog2;
+    break;
+  case "dog":
+    humanOrDog2;
+    break;
+  case "fish":
+    humanOrDog2;
+    break;
+  default:
+    humanOrDog2;
+
+    const _check: never = humanOrDog2;
+    break;
+}
+```

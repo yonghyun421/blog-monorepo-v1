@@ -1,0 +1,127 @@
+---
+title: "인증과 CORS의 관계"
+date: "2025-03-30"
+description: "인증과 CORS의 관계"
+---
+# 인증과 CORS의 관계
+
+웹 개발에서 인증과 CORS(Cross-Origin Resource Sharing)는 깊은 상호작용을 가진다. 이 둘의 적절한 통합이 보안과 사용자 경험에 중요하다. 이 글에서는 가장 중요한 내용만 집중적으로 살펴본다.
+
+## 1. `withCredentials`와 쿠키 기반 인증
+
+### 핵심 사항
+
+- **기본 동작**: 브라우저는 기본적으로 크로스 오리진 요청에 쿠키를 포함하지 않는다.
+- **클라이언트 설정**: 쿠키를 포함하려면 `withCredentials: true` 또는 `credentials: 'include'` 설정이 필요하다.
+
+```javascript
+// fetch API 사용 시
+fetch("https://api.example.com/data", {
+  credentials: "include", // 중요!
+});
+```
+
+- **서버 측 필수 CORS 설정**:
+
+```javascript
+// Express.js 예시
+app.use((req, res, next) => {
+  // 와일드카드(*) 사용 불가 - 명시적 오리진 필요
+  res.header("Access-Control-Allow-Origin", "https://app.example.com");
+  // 반드시 true로 설정
+  res.header("Access-Control-Allow-Credentials", "true");
+  next();
+});
+```
+
+- **중요 제한사항**:
+  1. `Access-Control-Allow-Origin: *`와 함께 사용 불가
+  2. 최신 브라우저에서는 `SameSite=None; Secure` 쿠키 설정 필요
+  3. CSRF 방어책 추가 필요
+
+## 2. JWT와 같은 토큰 기반 인증
+
+### 핵심 사항
+
+- **기본 동작**: Authorization 헤더에 토큰을 포함하여 요청
+
+```javascript
+fetch("https://api.example.com/data", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
+```
+
+- **CORS 관련 고려사항**:
+  1. Authorization 헤더를 허용하도록 CORS 설정 필요
+  2. 커스텀 헤더 사용 시 항상 프리플라이트 요청 발생
+  3. 성능 최적화를 위한 프리플라이트 캐싱 설정 권장
+
+```javascript
+res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+res.header("Access-Control-Max-Age", "86400"); // 24시간 캐싱
+```
+
+- **장단점**:
+  - 장점: CSRF에 안전, 서버 확장성, 다중 도메인 지원
+  - 단점: XSS 취약성(localStorage 사용 시), 토큰 관리 복잡성
+
+## 3. OAuth 흐름에서의 CORS 문제
+
+### 핵심 사항
+
+- **주요 문제점**: 대부분의 OAuth 제공자는 토큰 엔드포인트에 CORS를 지원하지 않음
+
+- **잘못된 접근법**: 프론트엔드에서 직접 토큰 교환 시도
+
+  - CORS 오류 발생
+  - 클라이언트 시크릿 노출 위험
+
+- **올바른 접근법**: 백엔드 프록시 패턴 사용
+  1. 프론트엔드에서 인증 코드만 백엔드로 전송
+  2. 백엔드에서 OAuth 제공자와 토큰 교환
+  3. 백엔드에서 자체 토큰(JWT) 또는 세션 생성하여 반환
+
+```javascript
+// 프론트엔드: 백엔드로 인증 코드 전송
+const code = new URLSearchParams(window.location.search).get("code");
+fetch("https://api.example.com/auth/callback", {
+  method: "POST",
+  body: JSON.stringify({ code }),
+});
+
+// 백엔드: 토큰 교환 및 처리
+app.post("/auth/callback", async (req, res) => {
+  const { code } = req.body;
+  // 백엔드에서 OAuth 제공자와 토큰 교환
+  // 사용자 정보 가져오기
+  // 자체 토큰 생성 및 반환
+});
+```
+
+- **추가 보안 조치**:
+  1. 상태 파라미터(CSRF 방지)
+  2. PKCE(코드 인터셉트 방지)
+  3. 인증 코드 흐름 사용(암시적 흐름 대신)
+
+## 결론: 핵심 권장사항
+
+1. **쿠키 기반 인증 사용 시**:
+
+   - `withCredentials: true` + 명시적 `Access-Control-Allow-Origin` + `Access-Control-Allow-Credentials: true`
+   - SameSite 쿠키 정책 고려
+   - CSRF 방어책 구현
+
+2. **JWT 기반 인증 사용 시**:
+
+   - Authorization 헤더 허용 설정
+   - 프리플라이트 캐싱으로 성능 최적화
+   - XSS 방어 강화(httpOnly 쿠키 사용 고려)
+
+3. **OAuth 구현 시**:
+   - 항상 백엔드 프록시 패턴 사용
+   - 클라이언트 시크릿 보호
+   - 상태 파라미터와 PKCE 구현
+
+각 인증 방식의 장단점을 고려해 애플리케이션에 가장 적합한 방식을 선택하고, 보안과 사용자 경험 사이의 균형을 유지하는 것이 중요하다.
