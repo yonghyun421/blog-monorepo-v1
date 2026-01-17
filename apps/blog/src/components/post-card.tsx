@@ -20,10 +20,15 @@ export function PostCard({ post, className, featured = false }: PostCardProps) {
       )}
     >
       <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
           <time dateTime={post.date}>
             {format(parseISO(post.date), "LLLL d, yyyy")}
           </time>
+          {post.category && (
+            <span className="rounded-full bg-secondary px-2 py-0.5 text-xs">
+              {post.category}
+            </span>
+          )}
           {post.tags && (
             <div className="flex gap-1">
               {post.tags.slice(0, 2).map((tag) => (
