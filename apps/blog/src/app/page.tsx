@@ -1,13 +1,14 @@
-import { allPosts } from "contentlayer/generated";
 import { compareDesc } from "date-fns";
 import { BentoGrid } from "@/components/bento-grid";
 import { PostCard } from "@/components/post-card";
 import { FilterBar } from "@/components/filter-bar";
 import { SiteSidebar } from "@/components/site-sidebar";
 import { getCategories, getTags } from "@/lib/taxonomy";
+import { allPosts } from "../../.contentlayer/generated/index.mjs";
+import type { Post } from "../../.contentlayer/generated/types";
 
 export default function Home() {
-  const posts = allPosts.sort((a, b) => compareDesc(new Date(a.date), new Date(b.date)));
+  const posts = (allPosts as Post[]).sort((a, b) => compareDesc(new Date(a.date), new Date(b.date)));
   const categories = getCategories(posts);
   const tags = getTags(posts);
 
