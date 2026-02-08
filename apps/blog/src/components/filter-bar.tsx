@@ -28,9 +28,9 @@ export function FilterBar({
               href={`/category/${category.slug}`}
               className={cn(
                 "rounded-full border px-3 py-1 text-xs text-muted-foreground",
-                "hover:text-foreground",
+                "transition-colors duration-200 hover:text-accent",
                 activeCategorySlug === category.slug &&
-                  "border-foreground text-foreground"
+                  "border-accent text-accent"
               )}
             >
               {category.name}
@@ -51,8 +51,8 @@ export function FilterBar({
               href={`/tag/${tag.slug}`}
               className={cn(
                 "rounded-full border px-3 py-1 text-xs text-muted-foreground",
-                "hover:text-foreground",
-                activeTagSlug === tag.slug && "border-foreground text-foreground"
+                "transition-colors duration-200 hover:text-accent",
+                activeTagSlug === tag.slug && "border-accent text-accent"
               )}
             >
               #{tag.name}

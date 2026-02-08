@@ -1,49 +1,58 @@
 import { compareDesc } from "date-fns";
-import { BentoGrid } from "@/components/bento-grid";
+import { HeroSection } from "@/components/hero-section";
+import { SectionHeading } from "@/components/section-heading";
+import { ProjectCard } from "@/components/project-card";
 import { PostCard } from "@/components/post-card";
-import { FilterBar } from "@/components/filter-bar";
-import { SiteSidebar } from "@/components/site-sidebar";
-import { getCategories, getTags } from "@/lib/taxonomy";
-import { allPosts } from "../../.contentlayer/generated/index.mjs";
-import type { Post } from "../../.contentlayer/generated/types";
+import { AnimateInView } from "@/components/animate-in-view";
+import { allPosts, allProjects } from "../../.contentlayer/generated/index.mjs";
+import type { Post, Project } from "../../.contentlayer/generated/types";
 
 export default function Home() {
-  const posts = (allPosts as Post[]).sort((a, b) => compareDesc(new Date(a.date), new Date(b.date)));
-  const categories = getCategories(posts);
-  const tags = getTags(posts);
+  const featuredProjects = (allProjects as Project[])
+    .filter((p) => p.featured && p.published)
+    .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
+    .slice(0, 3);
+
+  const recentPosts = (allPosts as Post[])
+    .filter((p) => p.published !== false)
+    .sort((a, b) => compareDesc(new Date(a.date), new Date(b.date)))
+    .slice(0, 4);
 
   return (
-    <main className="container mx-auto min-h-screen py-10">
-      <header className="mb-10">
-        <div>
-          <h1 className="text-4xl font-bold tracking-tight">블로그</h1>
-          <p className="mt-2 text-lg text-muted-foreground">
-            기록하고, 만들고, 성장합니다.
-          </p>
-        </div>
-      </header>
+    <main className="container mx-auto min-h-screen px-4">
+      <HeroSection />
 
-      <FilterBar categories={categories} tags={tags} />
-
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
-        <div className="lg:col-span-9">
-          <BentoGrid>
-            {posts.map((post, idx) => (
-              <PostCard
-                key={post._id}
-                post={post}
-                featured={idx === 0}
-              />
-            ))}
-            {posts.length === 0 && (
-              <div className="flex h-full min-h-[200px] items-center justify-center rounded-xl border border-dashed bg-muted/50 p-6 text-muted-foreground md:col-span-3">
-                아직 게시물이 없습니다. content/posts에 글을 추가해 주세요.
-              </div>
-            )}
-          </BentoGrid>
+      <section className="py-12">
+        <SectionHeading title="주요 프로젝트" href="/projects" />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {featuredProjects.map((project, idx) => (
+            <AnimateInView key={project._id} delay={idx * 100}>
+              <ProjectCard project={project} />
+            </AnimateInView>
+          ))}
+          {featuredProjects.length === 0 && (
+            <p className="text-muted-foreground">
+              프로젝트를 준비 중입니다.
+            </p>
+          )}
         </div>
-        <SiteSidebar categories={categories} tags={tags} />
-      </div>
+      </section>
+
+      <section className="py-12">
+        <SectionHeading title="최근 글" href="/blog" />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {recentPosts.map((post, idx) => (
+            <AnimateInView key={post._id} delay={idx * 100}>
+              <PostCard post={post} />
+            </AnimateInView>
+          ))}
+          {recentPosts.length === 0 && (
+            <p className="text-muted-foreground">
+              아직 게시물이 없습니다.
+            </p>
+          )}
+        </div>
+      </section>
     </main>
   );
 }

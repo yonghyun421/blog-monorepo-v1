@@ -26,9 +26,9 @@ export function SiteSidebar({
                 key={category.slug}
                 href={`/category/${category.slug}`}
                 className={cn(
-                  "flex items-center justify-between rounded-md px-2 py-1 hover:text-foreground",
+                  "flex items-center justify-between rounded-md px-2 py-1 transition-colors duration-200 hover:text-accent",
                   activeCategorySlug === category.slug &&
-                    "bg-accent text-foreground"
+                    "bg-accent/10 font-medium text-accent"
                 )}
               >
                 <span>{category.name}</span>
@@ -49,8 +49,8 @@ export function SiteSidebar({
                 key={tag.slug}
                 href={`/tag/${tag.slug}`}
                 className={cn(
-                  "rounded-full border px-3 py-1 hover:text-foreground",
-                  activeTagSlug === tag.slug && "border-foreground text-foreground"
+                  "rounded-full border px-3 py-1 transition-colors duration-200 hover:text-accent",
+                  activeTagSlug === tag.slug && "border-accent text-accent"
                 )}
               >
                 #{tag.name}

@@ -26,14 +26,20 @@ export const getCategories = (posts: Post[]): TaxonomyItem[] => {
 };
 
 export const getTags = (posts: Post[]): TaxonomyItem[] => {
-  const map = new Map<string, number>();
+  const map = new Map<string, { name: string; count: number }>();
   posts.forEach((post) => {
     post.tags?.forEach((tag) => {
-      map.set(tag, (map.get(tag) ?? 0) + 1);
+      const slug = toSlug(tag);
+      const existing = map.get(slug);
+      if (existing) {
+        map.set(slug, { name: existing.name, count: existing.count + 1 });
+      } else {
+        map.set(slug, { name: tag, count: 1 });
+      }
     });
   });
   return Array.from(map.entries())
-    .map(([name, count]) => ({ name, slug: toSlug(name), count }))
+    .map(([slug, { name, count }]) => ({ name, slug, count }))
     .sort((a, b) => a.name.localeCompare(b.name));
 };
 

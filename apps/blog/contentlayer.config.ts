@@ -26,6 +26,34 @@ export const Post = defineDocumentType(() => ({
   },
 }));
 
+export const Project = defineDocumentType(() => ({
+  name: "Project",
+  filePathPattern: `projects/**/*.mdx`,
+  contentType: "mdx",
+  fields: {
+    title: { type: "string", required: true },
+    description: { type: "string", required: true },
+    date: { type: "date", required: true },
+    techStack: { type: "list", of: { type: "string" }, required: false },
+    githubUrl: { type: "string", required: false },
+    liveUrl: { type: "string", required: false },
+    featured: { type: "boolean", default: false },
+    published: { type: "boolean", default: true },
+    order: { type: "number", required: false },
+  },
+  computedFields: {
+    url: {
+      type: "string",
+      resolve: (project) =>
+        `/projects/${project._raw.flattenedPath.split("/").pop()}`,
+    },
+    slug: {
+      type: "string",
+      resolve: (project) => project._raw.flattenedPath.split("/").pop(),
+    },
+  },
+}));
+
 export const Note = defineDocumentType(() => ({
   name: "Note",
   filePathPattern: `notes/**/*.mdx`,
@@ -49,7 +77,7 @@ export const Note = defineDocumentType(() => ({
 
 export default makeSource({
   contentDirPath: "content",
-  documentTypes: [Post, Note],
+  documentTypes: [Post, Project, Note],
   mdx: {
     remarkPlugins: [remarkGfm],
     rehypePlugins: [

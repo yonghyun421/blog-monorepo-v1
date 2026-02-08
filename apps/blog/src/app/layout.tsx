@@ -1,16 +1,31 @@
 import type { Metadata } from "next";
-// import { Inter } from "next/font/google"; // Font usage example, skipping for now to avoid dependency if not installed
 import "../styles/globals.css";
-
-// const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "My Blog",
-  description: "A blog created with Next.js and Turborepo",
-};
-
 import { ThemeProvider } from "@/components/theme-provider";
 import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
+import { siteConfig } from "@/data/site-config";
+
+export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
+  title: {
+    default: siteConfig.title,
+    template: `%s | ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  openGraph: {
+    type: "website",
+    locale: "ko_KR",
+    url: siteConfig.url,
+    title: siteConfig.title,
+    description: siteConfig.description,
+    siteName: siteConfig.name,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.title,
+    description: siteConfig.description,
+  },
+};
 
 export default function RootLayout({
   children,
@@ -18,16 +33,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="">
+    <html lang="ko" suppressHydrationWarning>
+      <body>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <SiteHeader />
-          {children}
+          <div className="flex min-h-screen flex-col">
+            <SiteHeader />
+            <div className="flex-1">{children}</div>
+            <SiteFooter />
+          </div>
         </ThemeProvider>
       </body>
     </html>

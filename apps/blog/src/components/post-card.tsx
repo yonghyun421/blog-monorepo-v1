@@ -14,8 +14,8 @@ export function PostCard({ post, className, featured = false }: PostCardProps) {
     <Link
       href={post.url}
       className={cn(
-        "group relative flex flex-col justify-between overflow-hidden rounded-xl border bg-card p-6 transition-all hover:bg-accent/50",
-        featured ? "md:col-span-2 md:row-span-2" : "",
+        "group relative flex flex-col justify-between overflow-hidden rounded-xl border bg-card p-6 shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/30 hover:shadow-card-hover",
+        "h-full",
         className
       )}
     >
@@ -25,14 +25,14 @@ export function PostCard({ post, className, featured = false }: PostCardProps) {
             {format(parseISO(post.date), "LLLL d, yyyy")}
           </time>
           {post.category && (
-            <span className="rounded-full bg-secondary px-2 py-0.5 text-xs">
+            <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
               {post.category}
             </span>
           )}
           {post.tags && (
             <div className="flex gap-1">
               {post.tags.slice(0, 2).map((tag) => (
-                <span key={tag} className="rounded-full bg-secondary px-2 py-0.5 text-xs">
+                <span key={tag} className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
                   #{tag}
                 </span>
               ))}

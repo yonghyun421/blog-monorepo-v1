@@ -37,7 +37,7 @@ export default async function PostPage({ params }: PostPageProps) {
     <div className="container mx-auto min-h-screen py-10">
        {/* Top Navigation / Breadcrumb */}
       <div className="mb-8">
-        <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">
+        <Link href="/blog" className="text-sm text-muted-foreground hover:text-foreground">
           ← 목록으로
         </Link>
       </div>
