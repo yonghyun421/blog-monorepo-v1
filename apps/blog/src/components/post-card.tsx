@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
-import { Post } from "contentlayer/generated";
+import type { Post } from "contentlayer/generated";
 import { motion, useMotionTemplate, useMotionValue, useReducedMotion } from "framer-motion";
 import { useState, type MouseEvent } from "react";
 import { cn } from "@repo/ui/utils";
