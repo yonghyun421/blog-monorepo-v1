@@ -5,7 +5,7 @@ export const siteConfig = {
   url: "https://yonghyun.dev",
   author: "Yonghyun",
   links: {
-    github: "https://github.com/yonghyun",
-    email: "mailto:yonghyun@example.com",
+    github: "https://github.com/yonghyun421",
+    email: "mailto:dydgus0421@gmail.com",
   },
 } as const;

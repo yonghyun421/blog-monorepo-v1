@@ -85,9 +85,7 @@ export default function RootLayout({
           <ScrollProgress />
           <div className="flex min-h-screen flex-col">
             <SiteHeader />
-            <PageTransition>
-              <div className="flex-1">{children}</div>
-            </PageTransition>
+            <PageTransition>{children}</PageTransition>
             <SiteFooter />
           </div>
         </ThemeProvider>

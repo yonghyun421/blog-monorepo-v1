@@ -14,7 +14,7 @@ export const toSlug = (value: string) =>
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-");
 
-const getPostTags = (post: Post) => {
+const getPostTags = (post: Post): string[] => {
   const withNormalized = post as Post & { normalizedTags?: string[] };
   return withNormalized.normalizedTags ?? post.tags ?? [];
 };
