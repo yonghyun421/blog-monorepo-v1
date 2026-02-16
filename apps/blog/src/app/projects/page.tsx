@@ -1,7 +1,6 @@
-import { allProjects } from "../../../.contentlayer/generated/index.mjs";
-import type { Project } from "../../../.contentlayer/generated/types";
 import { ProjectCard } from "@/components/project-card";
 import { AnimateInView } from "@/components/animate-in-view";
+import { getPublishedProjects } from "@/lib/content";
 
 export const metadata = {
   title: "프로젝트",
@@ -9,8 +8,7 @@ export const metadata = {
 };
 
 export default function ProjectsPage() {
-  const projects = (allProjects as Project[])
-    .filter((p) => p.published)
+  const projects = getPublishedProjects()
     .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
 
   return (

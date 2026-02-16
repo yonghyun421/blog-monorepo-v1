@@ -1,9 +1,9 @@
-import { allProjects } from "contentlayer/generated";
 import { notFound } from "next/navigation";
 import { ExternalLink, Github } from "lucide-react";
 import { Mdx } from "@/components/mdx";
 import { SkillBadge } from "@/components/skill-badge";
 import Link from "next/link";
+import { getPublishedProjects } from "@/lib/content";
 
 interface ProjectPageProps {
   params: Promise<{
@@ -12,12 +12,12 @@ interface ProjectPageProps {
 }
 
 export const generateStaticParams = async () =>
-  allProjects.map((project) => ({ slug: project.slug }));
+  getPublishedProjects().map((project) => ({ slug: project.slug }));
 
 export const generateMetadata = async ({ params }: ProjectPageProps) => {
   const slug = (await params).slug;
-  const project = allProjects.find((p) => p.slug === slug);
-  if (!project) throw new Error(`Project not found for slug: ${slug}`);
+  const project = getPublishedProjects().find((p) => p.slug === slug);
+  if (!project) return { title: "프로젝트" };
   return {
     title: project.title,
     description: project.description,
@@ -26,7 +26,7 @@ export const generateMetadata = async ({ params }: ProjectPageProps) => {
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const slug = (await params).slug;
-  const project = allProjects.find((p) => p.slug === slug);
+  const project = getPublishedProjects().find((p) => p.slug === slug);
 
   if (!project) notFound();
 

@@ -4,9 +4,8 @@ import { PostCard } from "@/components/post-card";
 import { FilterBar } from "@/components/filter-bar";
 import { SiteSidebar } from "@/components/site-sidebar";
 import { AnimateInView } from "@/components/animate-in-view";
+import { getPublishedPosts } from "@/lib/content";
 import { getCategories, getTags } from "@/lib/taxonomy";
-import { allPosts } from "../../../.contentlayer/generated/index.mjs";
-import type { Post } from "../../../.contentlayer/generated/types";
 
 export const metadata = {
   title: "블로그",
@@ -14,7 +13,7 @@ export const metadata = {
 };
 
 export default function BlogPage() {
-  const posts = (allPosts as Post[]).sort((a, b) =>
+  const posts = getPublishedPosts().sort((a, b) =>
     compareDesc(new Date(a.date), new Date(b.date))
   );
   const categories = getCategories(posts);

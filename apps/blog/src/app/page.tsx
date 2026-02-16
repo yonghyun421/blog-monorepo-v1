@@ -4,17 +4,15 @@ import { SectionHeading } from "@/components/section-heading";
 import { ProjectCard } from "@/components/project-card";
 import { PostCard } from "@/components/post-card";
 import { AnimateInView } from "@/components/animate-in-view";
-import { allPosts, allProjects } from "../../.contentlayer/generated/index.mjs";
-import type { Post, Project } from "../../.contentlayer/generated/types";
+import { getPublishedPosts, getPublishedProjects } from "@/lib/content";
 
 export default function Home() {
-  const featuredProjects = (allProjects as Project[])
-    .filter((p) => p.featured && p.published)
+  const featuredProjects = getPublishedProjects()
+    .filter((p) => p.featured)
     .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
     .slice(0, 3);
 
-  const recentPosts = (allPosts as Post[])
-    .filter((p) => p.published !== false)
+  const recentPosts = getPublishedPosts()
     .sort((a, b) => compareDesc(new Date(a.date), new Date(b.date)))
     .slice(0, 4);
 
@@ -22,7 +20,11 @@ export default function Home() {
     <main className="container mx-auto min-h-screen px-4">
       <HeroSection />
 
-      <section className="py-12">
+      <section className="relative py-14">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-40 bg-gradient-to-b from-accent/5 to-transparent"
+        />
         <SectionHeading title="주요 프로젝트" href="/projects" />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {featuredProjects.map((project, idx) => (
@@ -38,7 +40,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-12">
+      <section className="py-14">
         <SectionHeading title="최근 글" href="/blog" />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {recentPosts.map((post, idx) => (

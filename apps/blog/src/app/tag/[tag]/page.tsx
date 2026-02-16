@@ -1,10 +1,10 @@
-import { allPosts } from "contentlayer/generated";
 import { compareDesc } from "date-fns";
 import { notFound } from "next/navigation";
 import { BentoGrid } from "@/components/bento-grid";
 import { PostCard } from "@/components/post-card";
 import { FilterBar } from "@/components/filter-bar";
 import { SiteSidebar } from "@/components/site-sidebar";
+import { getPublishedPosts } from "@/lib/content";
 import { filterPostsByTag, getCategories, getTags } from "@/lib/taxonomy";
 
 interface TagPageProps {
@@ -14,13 +14,14 @@ interface TagPageProps {
 }
 
 export const generateStaticParams = async () =>
-  getTags(allPosts).map((tag) => ({ tag: tag.slug }));
+  getTags(getPublishedPosts()).map((tag) => ({ tag: tag.slug }));
 
 export default async function TagPage({ params }: TagPageProps) {
   const slug = (await params).tag;
-  const categories = getCategories(allPosts);
-  const tags = getTags(allPosts);
-  const filtered = filterPostsByTag(allPosts, slug).sort((a, b) =>
+  const posts = getPublishedPosts();
+  const categories = getCategories(posts);
+  const tags = getTags(posts);
+  const filtered = filterPostsByTag(posts, slug).sort((a, b) =>
     compareDesc(new Date(a.date), new Date(b.date))
   );
 

@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { allPosts } from "contentlayer/generated";
+import { getPublishedPosts } from "@/lib/content";
 import { FilterBar } from "@/components/filter-bar";
 import { getCategories, getTags } from "@/lib/taxonomy";
 
 export default function TagIndexPage() {
-  const tags = getTags(allPosts);
-  const categories = getCategories(allPosts);
+  const posts = getPublishedPosts();
+  const tags = getTags(posts);
+  const categories = getCategories(posts);
 
   return (
     <main className="container mx-auto min-h-screen py-10">

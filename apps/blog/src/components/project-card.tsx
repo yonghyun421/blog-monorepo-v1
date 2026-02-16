@@ -1,6 +1,15 @@
+"use client";
+
 import Link from "next/link";
 import { ExternalLink, Github } from "lucide-react";
 import type { Project } from "contentlayer/generated";
+import {
+  motion,
+  useMotionTemplate,
+  useMotionValue,
+  useReducedMotion,
+} from "framer-motion";
+import { useState, type MouseEvent } from "react";
 import { cn } from "@repo/ui/utils";
 import { SkillBadge } from "@/components/skill-badge";
 
@@ -10,13 +19,39 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project, className }: ProjectCardProps) {
+  const reduceMotion = useReducedMotion();
+  const [hovered, setHovered] = useState(false);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const spotlight = useMotionTemplate`radial-gradient(240px circle at ${mouseX}px ${mouseY}px, hsl(var(--accent) / 0.16), transparent 70%)`;
+
+  const onPointerMove = (event: MouseEvent<HTMLElement>) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    mouseX.set(event.clientX - bounds.left);
+    mouseY.set(event.clientY - bounds.top);
+  };
+
   return (
-    <div
+    <motion.div
       className={cn(
-        "group flex flex-col justify-between overflow-hidden rounded-xl border bg-card p-6 shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/30 hover:shadow-card-hover",
+        "group relative flex flex-col justify-between overflow-hidden rounded-xl border bg-card p-6 shadow-card transition-colors duration-300 hover:border-accent/30 hover:shadow-card-hover",
         className
       )}
+      whileHover={reduceMotion ? undefined : { y: -7, scale: 1.012 }}
+      whileTap={reduceMotion ? undefined : { scale: 0.996 }}
+      transition={{ type: "spring", stiffness: 260, damping: 20, mass: 0.35 }}
+      onMouseMove={onPointerMove}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
+      {!reduceMotion && (
+        <motion.div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{ background: spotlight, opacity: hovered ? 1 : 0 }}
+          transition={{ duration: 0.22 }}
+        />
+      )}
       <div className="flex flex-col gap-3">
         <Link href={project.url} className="block">
           <h3 className="text-xl font-bold tracking-tight transition-colors duration-200 group-hover:text-accent">
@@ -58,6 +93,6 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
           </a>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }

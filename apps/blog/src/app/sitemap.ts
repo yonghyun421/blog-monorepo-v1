@@ -1,15 +1,14 @@
 import type { MetadataRoute } from "next";
-import { allPosts, allProjects } from "../../.contentlayer/generated/index.mjs";
-import type { Post, Project } from "../../.contentlayer/generated/types";
+import { getPublishedPosts, getPublishedProjects } from "@/lib/content";
 import { siteConfig } from "@/data/site-config";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const posts = (allPosts as Post[]).map((post) => ({
+  const posts = getPublishedPosts().map((post) => ({
     url: `${siteConfig.url}${post.url}`,
     lastModified: new Date(post.date),
   }));
 
-  const projects = (allProjects as Project[]).map((project) => ({
+  const projects = getPublishedProjects().map((project) => ({
     url: `${siteConfig.url}${project.url}`,
     lastModified: new Date(project.date),
   }));

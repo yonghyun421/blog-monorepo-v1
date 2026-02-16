@@ -14,6 +14,11 @@ export const toSlug = (value: string) =>
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-");
 
+const getPostTags = (post: Post) => {
+  const withNormalized = post as Post & { normalizedTags?: string[] };
+  return withNormalized.normalizedTags ?? post.tags ?? [];
+};
+
 export const getCategories = (posts: Post[]): TaxonomyItem[] => {
   const map = new Map<string, number>();
   posts.forEach((post) => {
@@ -28,7 +33,7 @@ export const getCategories = (posts: Post[]): TaxonomyItem[] => {
 export const getTags = (posts: Post[]): TaxonomyItem[] => {
   const map = new Map<string, { name: string; count: number }>();
   posts.forEach((post) => {
-    post.tags?.forEach((tag) => {
+    getPostTags(post).forEach((tag) => {
       const slug = toSlug(tag);
       const existing = map.get(slug);
       if (existing) {
@@ -47,4 +52,4 @@ export const filterPostsByCategory = (posts: Post[], slug: string) =>
   posts.filter((post) => post.category && toSlug(post.category) === slug);
 
 export const filterPostsByTag = (posts: Post[], slug: string) =>
-  posts.filter((post) => post.tags?.some((tag) => toSlug(tag) === slug));
+  posts.filter((post) => getPostTags(post).some((tag) => toSlug(tag) === slug));

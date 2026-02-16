@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@repo/ui/utils";
 
 interface AnimateInViewProps {
@@ -14,43 +15,21 @@ export function AnimateInView({
   className,
   delay = 0,
 }: AnimateInViewProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(el);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    observer.observe(el);
-
-    return () => {
-      observer.unobserve(el);
-    };
-  }, []);
+  const reduceMotion = useReducedMotion();
 
   return (
-    <div
-      ref={ref}
-      className={cn(
-        "transition-all duration-600 ease-out",
-        isVisible
-          ? "translate-y-0 opacity-100"
-          : "translate-y-4 opacity-0",
-        className
-      )}
-      style={{ transitionDelay: `${delay}ms` }}
+    <motion.div
+      className={cn(className)}
+      initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 18 }}
+      whileInView={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{
+        duration: reduceMotion ? 0.35 : 0.55,
+        ease: "easeOut",
+        delay: delay / 1000,
+      }}
     >
       {children}
-    </div>
+    </motion.div>
   );
 }

@@ -1,10 +1,10 @@
-import { allPosts } from "contentlayer/generated";
 import { compareDesc } from "date-fns";
 import { notFound } from "next/navigation";
 import { BentoGrid } from "@/components/bento-grid";
 import { PostCard } from "@/components/post-card";
 import { FilterBar } from "@/components/filter-bar";
 import { SiteSidebar } from "@/components/site-sidebar";
+import { getPublishedPosts } from "@/lib/content";
 import {
   filterPostsByCategory,
   getCategories,
@@ -18,13 +18,16 @@ interface CategoryPageProps {
 }
 
 export const generateStaticParams = async () =>
-  getCategories(allPosts).map((category) => ({ category: category.slug }));
+  getCategories(getPublishedPosts()).map((category) => ({
+    category: category.slug,
+  }));
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const slug = (await params).category;
-  const categories = getCategories(allPosts);
-  const tags = getTags(allPosts);
-  const filtered = filterPostsByCategory(allPosts, slug).sort((a, b) =>
+  const posts = getPublishedPosts();
+  const categories = getCategories(posts);
+  const tags = getTags(posts);
+  const filtered = filterPostsByCategory(posts, slug).sort((a, b) =>
     compareDesc(new Date(a.date), new Date(b.date))
   );
 
