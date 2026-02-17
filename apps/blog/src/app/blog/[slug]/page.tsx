@@ -5,6 +5,7 @@ import { Mdx } from "@/components/mdx";
 import Link from "next/link";
 import { SiteSidebar } from "@/components/site-sidebar";
 import { PostToc } from "@/components/post-toc";
+import { MobilePostToc } from "@/components/mobile-post-toc";
 import { PostCard } from "@/components/post-card";
 import { StructuredData } from "@/components/structured-data";
 import { getPublishedPosts } from "@/lib/content";
@@ -16,6 +17,7 @@ import {
   getPrevNextPosts,
   getReadingTime,
   getRelatedPosts,
+  getSeriesPosts,
 } from "@/lib/post-meta";
 import { siteConfig } from "@/data/site-config";
 import { profile } from "@/data/profile";
@@ -77,6 +79,7 @@ export default async function PostPage({ params }: PostPageProps) {
   const displayTags = getPostTags(post);
   const { prev, next } = getPrevNextPosts(posts, post.slug);
   const relatedPosts = getRelatedPosts(posts, post, 3);
+  const seriesPosts = getSeriesPosts(posts, post, 3);
   const postUrl = `${siteConfig.url}${post.url}`;
   const postDescription = post.description ?? siteConfig.description;
 
@@ -120,6 +123,7 @@ export default async function PostPage({ params }: PostPageProps) {
     <div className="container mx-auto min-h-screen py-10">
       <StructuredData data={articleStructuredData} />
       <StructuredData data={breadcrumbStructuredData} />
+      <MobilePostToc headings={headings} />
        {/* Top Navigation / Breadcrumb */}
       <div className="mb-8">
         <Link href="/blog" className="text-sm text-muted-foreground hover:text-foreground">
@@ -230,6 +234,51 @@ export default async function PostPage({ params }: PostPageProps) {
                 </div>
               </div>
             )}
+
+            <div className="rounded-2xl border bg-card/70 p-5">
+              <h2 className="text-lg font-bold tracking-tight">다음 액션</h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                더 많은 글을 구독하고, 시리즈 흐름으로 이어서 읽고, 필요하면 바로 연락할 수 있습니다.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <a
+                  href="/rss.xml"
+                  className="rounded-full border px-3 py-1.5 text-xs font-medium hover:border-accent/40"
+                >
+                  RSS 구독
+                </a>
+                <a
+                  href={siteConfig.links.email}
+                  className="rounded-full border px-3 py-1.5 text-xs font-medium hover:border-accent/40"
+                >
+                  문의하기
+                </a>
+                <Link
+                  href="/projects"
+                  className="rounded-full border px-3 py-1.5 text-xs font-medium hover:border-accent/40"
+                >
+                  프로젝트 보기
+                </Link>
+              </div>
+              {seriesPosts.length > 0 && (
+                <div className="mt-5 border-t pt-4">
+                  <div className="mb-2 text-xs font-semibold text-muted-foreground">
+                    관련 시리즈
+                  </div>
+                  <div className="space-y-2">
+                    {seriesPosts.map((seriesPost) => (
+                      <Link
+                        key={seriesPost._id}
+                        href={seriesPost.url}
+                        className="block rounded-lg border px-3 py-2 text-sm hover:border-accent/40"
+                      >
+                        {seriesPost.title}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </section>
         </main>
 

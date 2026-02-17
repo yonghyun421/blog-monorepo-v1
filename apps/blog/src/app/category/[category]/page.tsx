@@ -4,12 +4,14 @@ import { BentoGrid } from "@/components/bento-grid";
 import { PostCard } from "@/components/post-card";
 import { FilterBar } from "@/components/filter-bar";
 import { SiteSidebar } from "@/components/site-sidebar";
+import { StructuredData } from "@/components/structured-data";
 import { getPublishedPosts } from "@/lib/content";
 import {
   filterPostsByCategory,
   getCategories,
   getTags,
 } from "@/lib/taxonomy";
+import { siteConfig } from "@/data/site-config";
 
 interface CategoryPageProps {
   params: Promise<{
@@ -33,9 +35,49 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   const current = categories.find((category) => category.slug === slug);
   if (!current) notFound();
+  const pageUrl = `${siteConfig.url}/category/${slug}`;
+
+  const collectionStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `카테고리: ${current.name}`,
+    url: pageUrl,
+    description: `${current.name}에 속한 글 목록`,
+    inLanguage: "ko-KR",
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: filtered.map((post, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        url: `${siteConfig.url}${post.url}`,
+        name: post.title,
+      })),
+    },
+  };
+
+  const breadcrumbStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "카테고리",
+        item: `${siteConfig.url}/category`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: current.name,
+        item: pageUrl,
+      },
+    ],
+  };
 
   return (
     <main className="container mx-auto min-h-screen py-10">
+      <StructuredData data={collectionStructuredData} />
+      <StructuredData data={breadcrumbStructuredData} />
       <header className="mb-10">
         <h1 className="text-3xl font-bold tracking-tight">
           카테고리: {current.name}

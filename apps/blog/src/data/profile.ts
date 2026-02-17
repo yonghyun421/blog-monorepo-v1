@@ -91,10 +91,6 @@ export const profile = {
       items: ["React", "Next.js", "TypeScript", "Tailwind CSS", "HTML/CSS"],
     },
     {
-      category: "Backend",
-      items: ["Node.js", "Express", "PostgreSQL"],
-    },
-    {
       category: "DevOps",
       items: ["Docker", "Vercel", "GitHub Actions"],
     },

@@ -78,3 +78,15 @@ export const getPostMeta = (post: Post) => {
     topics: item.topics ?? [],
   };
 };
+
+export const getSeriesPosts = (posts: Post[], current: Post, limit = 3) => {
+  const series = (current as ExtendedPost).series;
+  if (!series) return [];
+
+  return sortPostsByDateDesc(posts)
+    .filter((post) => {
+      const item = post as ExtendedPost;
+      return item.series === series && post.slug !== current.slug;
+    })
+    .slice(0, limit);
+};
